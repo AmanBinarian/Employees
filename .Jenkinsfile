@@ -2,7 +2,7 @@ pipeline {
     agent any
  
     environment {
-        CODACY_API_TOKEN = credentials('CODACY_API_TOKEN')
+        CODACY_API_TOKEN = credentials('codacy-token')
     }
  
     triggers {
