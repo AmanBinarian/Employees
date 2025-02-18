@@ -100,12 +100,12 @@ public class EmployeeService {
         Document document = new Document();
         PdfWriter.getInstance(document, outputStream);
         document.open();
-        document.add(new Paragraph("Employee ID: " + employee.getId()));
-        document.add(new Paragraph("Username: " + employee.getUsername()));
-        document.add(new Paragraph("Password: " + employee.getPassword()));
-        document.add(new Paragraph("Role: " + employee.getRole()));
-        document.add(new Paragraph("Department: " + employee.getDepartment()));
-        document.add(new Paragraph("SQS Message ID: " + messageId));
+        document.add(new Paragraph("Employee ID : " + employee.getId()));
+        document.add(new Paragraph("Username : " + employee.getUsername()));
+        document.add(new Paragraph("Password : " + employee.getPassword()));
+        document.add(new Paragraph("Role : " + employee.getRole()));
+        document.add(new Paragraph("Department : " + employee.getDepartment()));
+        document.add(new Paragraph("SQS Message ID : " + messageId));
         document.close();
     }
 

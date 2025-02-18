@@ -39,6 +39,8 @@ public class Employee {
 	public String getDepartment() {
 		return department;
 	}
+	
+//	this is my department 
 
 	public void setDepartment(String department) {
 		this.department = department;
