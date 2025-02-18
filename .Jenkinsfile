@@ -12,7 +12,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/your-org/your-springboot-project.git'
+                git 'https://github.com/AmanBinarian/Employees.git'
             }
         }
  
