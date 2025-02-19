@@ -34,6 +34,7 @@ pipeline {
                 script {
                     echo "Running Codacy Analysis..."
                     bat 'set CODACY_PROJECT_TOKEN=%CODACY_PROJECT_TOKEN%'
+                    echo "Set codacy token "
                     bat 'mvn clean install'
                     bat 'mvn clean compile codacy-analysis:coverage'
                 
