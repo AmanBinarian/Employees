@@ -1,26 +1,36 @@
-
 pipeline {
     agent any
-
-    triggers {
-        githubPush()  // Auto-triggers on GitHub push
+    environment {
+        CODACY_API_TOKEN = credentials('codacy-token') 
+        PROJECT_TOKEN = "ed311edadec7476c9463b5299dc44717"
+        CODACY_URL = "https://app.codacy.com/api/v3/analysis"
     }
-    
     stages {
-        stage('Build & Test') {
+        stage('Build') {
             steps {
-                echo "Starting Build..."
-                bat 'mvn clean install -DskipTests'
+                echo "Building the project..."
+                sh 'mvn clean package' 
             }
         }
-    }
-
-    post {
-        success {
-            echo "Build completed successfully!"
+        stage('Run Tests') {
+            steps {
+                echo "Running tests and generating coverage report..."
+                sh 'mvn test jacoco:report'  
+            }
         }
-        failure {
-            echo "Build failed. Check the logs for errors."
+        stage('Send Report to Codacy') {
+            steps {
+                echo "Sending coverage report to Codacy..."
+                sh """
+                curl -X POST -H "Content-Type: application/json" \
+                     -H "api-token: $CODACY_API_TOKEN" \
+                     -d '{
+                           "projectToken": "$PROJECT_TOKEN",
+                           "coverageReport": "target/site/jacoco/jacoco.xml"
+                         }' \
+                     "$CODACY_URL"
+                """
+            }
         }
     }
 }
