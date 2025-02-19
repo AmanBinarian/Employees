@@ -13,7 +13,7 @@ pipeline {
         stage('Build & Test') {
             steps {
                 echo "Starting Build..."
-                bat 'mvn clean -DskipTests'
+                bat 'mvn clean install -DskipTests'
             }
         }
     }
