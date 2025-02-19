@@ -35,14 +35,15 @@ pipeline {
                 script {
                     echo "Running Codacy Analysis..."
                     bat '''
-                        export CODACY_PROJECT_TOKEN=${CODACY_PROJECT_TOKEN}
+                        set CODACY_PROJECT_TOKEN=%CODACY_PROJECT_TOKEN%
                         mvn clean compile codacy-analysis:coverage
                     '''
                 }
             }
         }
- 
-    post {
+    }  // 🔹 Closing bracket for `stages`
+
+    post {  // 🔹 Move `post` outside of `stages`
         success {
             echo "Build, Codacy analysis, and deployment successful!"
         }
@@ -50,5 +51,4 @@ pipeline {
             echo "Pipeline failed! Check logs for details."
         }
     }
-}
-}
+}  // 🔹 Closing bracket for `pipeline`
