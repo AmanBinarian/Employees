@@ -2,8 +2,8 @@ pipeline {
     agent any
  
     environment {
-        GIT_REPO = 'https://github.com/AmanBinarian/Employee.git' 
-        GIT_BRANCH = 'master' 
+        // GIT_REPO = 'https://github.com/AmanBinarian/Employee.git' 
+        // GIT_BRANCH = 'master' 
         CODACY_PROJECT_TOKEN = credentials('codacy-token') 
     }
  
