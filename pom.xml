@@ -73,12 +73,25 @@
         <version>2.20.0</version>
     </dependency>
 
-       <dependency>
+   <dependency>
     <groupId>com.itextpdf</groupId>
     <artifactId>itextpdf</artifactId>
     <version>5.5.13.3</version>
+   </dependency>
+   
+   <!-- https://mvnrepository.com/artifact/com.codacy/codacy-coverage-reporter -->
+<dependency>
+<groupId>com.codacy</groupId>
+<artifactId>codacy-coverage-reporter</artifactId>
+<version>7.1.0</version>
 </dependency>
-
+ 
+   
+<dependency>
+<groupId>com.codacy</groupId>
+<artifactId>codacy-plugins_2.13</artifactId>
+<version>26.4.0_play_2.8</version>
+</dependency>
         <!-- Lombok (For Reducing Boilerplate Code) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -92,13 +105,25 @@
 		</dependency>
 
 	</dependencies>
-
+      <repositories>
+          <repository>
+               <id>codacy-repo</id>
+               <url>https://repository.codacy.com/artifactory/public</url>
+       </repository>
+    </repositories>
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			
+			<plugin>
+			    <groupId>com.codacy</groupId>
+			    <artifactId>codacy-analysis-cli</artifactId>
+			    <version>4.0.0</version>
+			</plugin>
+			
 		</plugins>
 	</build>
 
