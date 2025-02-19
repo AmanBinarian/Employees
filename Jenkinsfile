@@ -1,16 +1,17 @@
 pipeline {
     agent any
 
-    triggers {
-        githubPush()  // Auto-triggers on GitHub push
+    environment {
+        GIT_CREDENTIALS = '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' 
     }
 
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/AmanBinarian/Employee'
+                script {
+                    sh 'git clone https://${GIT_CREDENTIALS}@github.com/AmanBinarian/Employee.git'
+                }
             }
         }
     }
 }
-   
