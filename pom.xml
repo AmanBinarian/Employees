@@ -35,7 +35,6 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 		
-		
 
 <dependency>
     <groupId>org.springframework.boot</groupId>
@@ -79,19 +78,7 @@
     <version>5.5.13.3</version>
    </dependency>
    
-   <!-- https://mvnrepository.com/artifact/com.codacy/codacy-coverage-reporter -->
-<dependency>
-<groupId>com.codacy</groupId>
-<artifactId>codacy-coverage-reporter</artifactId>
-<version>7.1.0</version>
-</dependency>
- 
-   
-<dependency>
-<groupId>com.codacy</groupId>
-<artifactId>codacy-plugins_2.13</artifactId>
-<version>26.4.0_play_2.8</version>
-</dependency>
+
         <!-- Lombok (For Reducing Boilerplate Code) -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -104,13 +91,42 @@
 			<scope>test</scope>
 		</dependency>
 
+		
+   <!-- For codacy not working
+<dependency>
+<groupId>com.codacy</groupId>
+<artifactId>codacy-coverage-reporter</artifactId>
+<version>7.1.0</version>
+</dependency>
+ 
+   
+<dependency>
+<groupId>com.codacy</groupId>
+<artifactId>codacy-plugins_2.13</artifactId>
+<version>26.4.0_play_2.8</version>
+</dependency>-->
+
+ 
+
+
 	</dependencies>
-      <repositories>
+	
+	
+    	<!--<repositories>
           <repository>
                <id>codacy-repo</id>
                <url>https://repository.codacy.com/artifactory/public</url>
        </repository>
-    </repositories>
+    </repositories>-->	
+    
+    <pluginRepositories>    
+    <pluginRepository>        
+        <id>codacy</id>        
+        <name>Codacy Repository</name>        
+        <url>https://jcenter.bintray.com</url>    
+   </pluginRepository>
+   </pluginRepositories>
+    
 	<build>
 		<plugins>
 			<plugin>
@@ -118,11 +134,20 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 			
-			<plugin>
-			    <groupId>com.codacy</groupId>
-			    <artifactId>codacy-analysis-cli</artifactId>
-			    <version>4.0.0</version>
-			</plugin>
+			<plugin>            
+			   <groupId>com.codacy</groupId>            
+			   <artifactId>codacy-coverage-reporter-maven-plugin</artifactId>            
+			   <version>1.2.1</version>            
+			   <executions>                
+			     <execution>                    
+			     <id>report</id>                    
+			     <phase>post-integration-test</phase>                    
+			     <goals>                        
+			     <goal>coverage</goal>                    
+			     </goals>                
+			     </execution>            
+			   </executions>        
+			 </plugin>
 			
 		</plugins>
 	</build>
