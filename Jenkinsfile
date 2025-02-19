@@ -27,6 +27,18 @@ pipeline {
                    echo "Complete codacy "
             }
         }
+
+        stage('Publish Codacy Report') {
+            steps {
+                publishHTML([allowMissing: false,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'target/site',
+                    reportFiles: 'index.html',
+                    reportName: 'Codacy Report'
+                ])
+            }
+        }
     }
 
     post {
