@@ -16,15 +16,15 @@ pipeline {
         stage('Send Report to Codacy') {
             steps {
                 echo "Sending coverage report to Codacy..."
-                bat '''
+                bat """
                 curl -X POST -H "Content-Type: application/json" \
                      -H "api-token: $CODACY_API_TOKEN" \
                      -d '{
                            "projectToken": "$PROJECT_TOKEN",
-                           "coverageReport": "target/site/jacoco/jacoco.xml"
+                           "coverageReport": "target/site/codacy/codacy_analysis.xml"
                          }' \
                      "$CODACY_URL"
-                '''
+                """
             }
         }
     }
