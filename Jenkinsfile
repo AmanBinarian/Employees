@@ -25,7 +25,6 @@ pipeline {
             steps {
                 script {
                     echo "Building the Maven project..."
-                    bat 'mvn clean package -DskipTests' 
                 }
             }
         }
