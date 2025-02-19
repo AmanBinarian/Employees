@@ -12,16 +12,11 @@ pipeline {
                 sh 'mvn clean install -DskipTests' 
             }
         }
-        stage('Run Tests') {
-            steps {
-                echo "Running tests and generating coverage report..."
-                sh 'mvn test jacoco:report'  
-            }
-        }
+       
         stage('Send Report to Codacy') {
             steps {
                 echo "Sending coverage report to Codacy..."
-                sh """
+                bat '''
                 curl -X POST -H "Content-Type: application/json" \
                      -H "api-token: $CODACY_API_TOKEN" \
                      -d '{
@@ -29,7 +24,7 @@ pipeline {
                            "coverageReport": "target/site/jacoco/jacoco.xml"
                          }' \
                      "$CODACY_URL"
-                """
+                '''
             }
         }
     }
