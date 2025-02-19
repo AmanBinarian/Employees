@@ -33,7 +33,7 @@ pipeline {
             steps {
                 script {
                     echo "Running Codacy Analysis..."
-                    bat '''
+                    sh '''
                         set CODACY_PROJECT_TOKEN=%CODACY_PROJECT_TOKEN%
                         mvn clean compile codacy-analysis:coverage
                     '''
