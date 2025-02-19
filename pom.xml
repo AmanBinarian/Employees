@@ -119,35 +119,13 @@
        </repository>
     </repositories>-->	
     
-    <pluginRepositories>    
-    <pluginRepository>        
-        <id>codacy</id>        
-        <name>Codacy Repository</name>        
-        <url>https://jcenter.bintray.com</url>    
-   </pluginRepository>
-   </pluginRepositories>
-    
+   
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
-			
-			<plugin>            
-			   <groupId>com.codacy</groupId>            
-			   <artifactId>codacy-coverage-reporter-maven-plugin</artifactId>            
-			   <version>1.2.1</version>            
-			   <executions>                
-			     <execution>                    
-			     <id>report</id>                    
-			     <phase>post-integration-test</phase>                    
-			     <goals>                        
-			     <goal>coverage</goal>                    
-			     </goals>                
-			     </execution>            
-			   </executions>        
-			 </plugin>
 			
 		</plugins>
 	</build>
