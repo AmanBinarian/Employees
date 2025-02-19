@@ -4,11 +4,7 @@ pipeline {
     triggers {
         githubPush()  // Auto-triggers on GitHub push
     }
-
-    tools {
-        maven 'Maven'  // Ensure Maven is installed and configured
-    }
-
+    
     stages {
         stage('Build & Test') {
             steps {
