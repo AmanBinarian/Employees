@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Build & Test') {
             steps {
-  
+                   echo "Build Done"
             }
         }
     }
