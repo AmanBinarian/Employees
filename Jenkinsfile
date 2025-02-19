@@ -23,7 +23,7 @@ pipeline {
                 bat 'set CODACY_PROJECT_TOKEN=%CODACY_PROJECT_TOKEN%'
                     echo "Set codacy token "
                   
-                    bat 'mvn clean compile codacy-analysis:coverage'
+                    bat 'mvn clean compile codacy-analysis:run'
                    echo "Complete codacy "
             }
         }
