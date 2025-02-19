@@ -30,6 +30,7 @@ pipeline {
 
         stage('Publish Codacy Report') {
             steps {
+                echo "Publishing the report and generating pdf"
                 publishHTML([allowMissing: false,
                     alwaysLinkToLastBuild: true,
                     keepAll: true,
