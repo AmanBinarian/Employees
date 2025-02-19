@@ -16,10 +16,15 @@ pipeline {
                 bat 'mvn clean install -DskipTests'
             }
         }
-        stage('Build & Test') {
+        stage('CodacyReportGeneration') {
             steps {
-                echo "Starting Build..."
-                bat 'mvn clean install -DskipTests'
+                echo "Starting codacy report..."
+                
+                bat 'set CODACY_PROJECT_TOKEN=%CODACY_PROJECT_TOKEN%'
+                    echo "Set codacy token "
+                  
+                    bat 'mvn clean compile codacy-analysis:coverage'
+                   echo "Complete codacy "
             }
         }
     }
