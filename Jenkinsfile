@@ -14,11 +14,13 @@ pipeline {
         stage('Fetch Codacy Issues & Save Report') {
             steps {
                 echo "Fetching Codacy issues..."
-                bat """
-                curl -X POST "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^  
-                     -H "api-token: %CODACY_API_TOKEN%" ^  
-                     -H "Content-Type: application/json" > issues.json
-                """
+               bat """
+curl -X POST "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^
+     --header "api-token: %CODACY_API_TOKEN%" ^
+     --header "Content-Type: application/json" ^
+     --silent --show-error --fail ^
+     --output issues.json
+"""
 
                 echo "Checking JSON Content..."
                 bat "type issues.json"
