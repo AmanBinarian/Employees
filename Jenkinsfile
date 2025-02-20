@@ -34,18 +34,6 @@ pipeline {
                 }
                 $output | Out-File -Encoding UTF8 codacy_issues.txt
                 '''
-
-                echo "Converting to PDF..."
-                powershell '''
-                $content = Get-Content codacy_issues.txt -Raw
-                $content | Out-File -FilePath "codacy_issues.pdf" -Encoding utf8
-                '''
-            }
-        }
-
-        stage('Archive Reports') {
-            steps {
-                archiveArtifacts artifacts: 'codacy_issues.txt, codacy_issues.pdf', fingerprint: true
             }
         }
     }
