@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        CODACY_API_TOKEN ="v4NIo6JPf6DVYHY63J2i" 
+        CODACY_API_TOKEN = "v4NIo6JPf6DVYHY63J2i" 
     }
     stages {
         stage('Build') {
@@ -11,14 +11,13 @@ pipeline {
             }
         }
        
-         stage('Send Report to Codacy') {
+        stage('Fetch Codacy Issues & Save Report') {
             steps {
-                echo "Sending coverage report to Codacy..."
+                echo "Fetching Codacy issues..."
                 bat """
-            curl -X POST "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" \
-             -H "api-token: %CODACY_API_TOKEN%" \
-             -H "Content-Type: application/json"
-
+                curl -X GET "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^
+                     -H "api-token: %CODACY_API_TOKEN%" ^
+                     -H "Content-Type: application/json" > issues.json
                 """
 
                 echo "Processing JSON data..."
@@ -35,6 +34,21 @@ pipeline {
                 }
                 $output | Out-File -Encoding UTF8 codacy_issues.txt
                 """
+
+                echo "Converting to PDF..."
+                powershell """
+                $content = Get-Content codacy_issues.txt -Raw
+                $pdf = New-Object -ComObject Scripting.FileSystemObject
+                $pdfFile = $pdf.CreateTextFile("codacy_issues.pdf", $true)
+                $pdfFile.Write($content)
+                $pdfFile.Close()
+                """
+            }
+        }
+
+        stage('Archive Reports') {
+            steps {
+                archiveArtifacts artifacts: 'codacy_issues.txt, codacy_issues.pdf', fingerprint: true
             }
         }
     }
