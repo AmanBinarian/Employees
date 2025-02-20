@@ -2,7 +2,6 @@ pipeline {
     agent any
     environment {
         CODACY_API_TOKEN = credentials('codacy-token') 
-        CODACY_URL = "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search"
     }
     stages {
         stage('Build') {
@@ -12,21 +11,15 @@ pipeline {
             }
         }
        
-        stage('Fetch Codacy Issues') {
+         stage('Send Report to Codacy') {
             steps {
-                echo "Fetching issues from Codacy..."
-                script {
-                    def response = bat(
-                        script: """
-                        curl -X POST "${CODACY_URL}" ^
-                            -H "api-token: ${CODACY_API_TOKEN}" ^
-                            -H "Accept: application/json"
-                        """,
-                        returnStdout: true
-                    ).trim()
+                echo "Sending coverage report to Codacy..."
+                bat """
+            curl -X GET "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" \
+             -H "api-token: CODACY_API_TOKEN" \
+             -H "Content-Type: application/json"
 
-                    echo "Codacy Response: ${response}"
-                }
+                """
             }
         }
     }
