@@ -2,7 +2,7 @@ pipeline {
     agent any
     environment {
         CODACY_API_TOKEN = credentials('codacy-token') 
-        PROJECT_TOKEN = "ed311edadec7476c9463b5299dc44717"
+        PROJECT_TOKEN = credentials('PROJECT_TOKEN')
         CODACY_URL = "https://app.codacy.com/api/v3/analysis"
     }
     stages {
