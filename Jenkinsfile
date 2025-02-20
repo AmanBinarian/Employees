@@ -15,25 +15,54 @@ pipeline {
             steps {
                 echo "Fetching Codacy issues..."
                 bat """
-                curl -X POST "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^
+                curl -X GET "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^
                      -H "api-token: %CODACY_API_TOKEN%" ^
                      -H "Content-Type: application/json" > issues.json
                 """
 
+                echo "Checking JSON Content..."
+                bat "type issues.json"
+
                 echo "Processing JSON data..."
                 powershell '''
-                $json = Get-Content issues.json | ConvertFrom-Json
-                $output = @()
-                foreach ($issue in $json.issues) {
-                    $output += "Issue ID: $($issue.issueId)"
-                    $output += "Message: $($issue.message)"
-                    $output += "File Path: $($issue.filePath)"
-                    $output += "Severity Level: $($issue.severityLevel)"
-                    $output += "Sub Category: $($issue.subCategory)"
-                    $output += "--------------------------------------"
+                $jsonContent = Get-Content issues.json -Raw
+                if (-not $jsonContent) {
+                    Write-Host "ERROR: issues.json is empty!"
+                    exit 1
                 }
-                $output | Out-File -Encoding UTF8 codacy_issues.txt
+                
+                try {
+                    $json = $jsonContent | ConvertFrom-Json
+                    if (-not $json.issues) {
+                        Write-Host "ERROR: JSON does not contain an 'issues' property!"
+                        exit 1
+                    }
+
+                    $output = @()
+                    foreach ($issue in $json.issues) {
+                        $output += "Issue ID: $($issue.issueId)"
+                        $output += "Message: $($issue.message)"
+                        $output += "File Path: $($issue.filePath)"
+                        $output += "Severity Level: $($issue.severityLevel)"
+                        $output += "Sub Category: $($issue.subCategory)"
+                        $output += "--------------------------------------"
+                    }
+                    $output | Out-File -Encoding UTF8 codacy_issues.txt
+                }
+                catch {
+                    Write-Host "ERROR: Failed to parse JSON!"
+                    exit 1
+                }
                 '''
+
+                echo "Verifying Text File..."
+                bat "type codacy_issues.txt"
+            }
+        }
+
+        stage('Archive Reports') {
+            steps {
+                archiveArtifacts artifacts: 'codacy_issues.txt, issues.json', fingerprint: true
             }
         }
     }
