@@ -39,7 +39,7 @@ pipeline {
                     }
 
                     $output = @()
-                    foreach ($issue in $json.issues) {
+                    foreach ($issues in $json.issues) {
                         $output += "Issue ID: $($issue.issueId)"
                         $output += "Message: $($issue.message)"
                         $output += "File Path: $($issue.filePath)"
