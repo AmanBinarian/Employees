@@ -15,7 +15,7 @@ pipeline {
             steps {
                 echo "Fetching Codacy issues..."
                 bat """
-                curl -X GET "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^
+                curl -X POST "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^
                      -H "api-token: %CODACY_API_TOKEN%" ^
                      -H "Content-Type: application/json" > issues.json
                 """
