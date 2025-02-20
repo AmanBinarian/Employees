@@ -15,13 +15,13 @@ pipeline {
             steps {
                 echo "Fetching Codacy issues..."
                 bat """
-                curl -X GET "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" /
-                     -H "api-token: %CODACY_API_TOKEN%" /
+                curl -X GET "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^
+                     -H "api-token: %CODACY_API_TOKEN%" ^
                      -H "Content-Type: application/json" > issues.json
                 """
 
                 echo "Processing JSON data..."
-                powershell """
+                powershell '''
                 $json = Get-Content issues.json | ConvertFrom-Json
                 $output = @()
                 foreach ($issue in $json.issues) {
@@ -30,19 +30,16 @@ pipeline {
                     $output += "File Path: $($issue.filePath)"
                     $output += "Severity Level: $($issue.severityLevel)"
                     $output += "Sub Category: $($issue.subCategory)"
-                    $output += '--------------------------------------'
+                    $output += "--------------------------------------"
                 }
                 $output | Out-File -Encoding UTF8 codacy_issues.txt
-                """
+                '''
 
                 echo "Converting to PDF..."
-                powershell """
+                powershell '''
                 $content = Get-Content codacy_issues.txt -Raw
-                $pdf = New-Object -ComObject Scripting.FileSystemObject
-                $pdfFile = $pdf.CreateTextFile("codacy_issues.pdf", $true)
-                $pdfFile.Write($content)
-                $pdfFile.Close()
-                """
+                $content | Out-File -FilePath "codacy_issues.pdf" -Encoding utf8
+                '''
             }
         }
 
