@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        CODACY_API_TOKEN = credentials('codacy-token') 
+        CODACY_API_TOKEN ="v4NIo6JPf6DVYHY63J2i" 
     }
     stages {
         stage('Build') {
