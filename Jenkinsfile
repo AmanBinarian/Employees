@@ -15,8 +15,8 @@ pipeline {
             steps {
                 echo "Fetching Codacy issues..."
                 bat """
-                curl -X POST "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^
-                     -H "api-token: %CODACY_API_TOKEN%" ^
+                curl -X POST "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^  
+                     -H "api-token: %CODACY_API_TOKEN%" ^  
                      -H "Content-Type: application/json" > issues.json
                 """
 
@@ -30,27 +30,28 @@ pipeline {
                     Write-Host "ERROR: issues.json is empty!"
                     exit 1
                 }
-                
+
                 try {
                     $json = $jsonContent | ConvertFrom-Json
-                    if (-not $json.issues) {
-                        Write-Host "ERROR: JSON does not contain an 'issues' property!"
+                    if (-not $json.data) {
+                        Write-Host "ERROR: JSON does not contain a 'data' property!"
                         exit 1
                     }
 
                     $output = @()
-                    foreach ($issues in $json.issues) {
+                    foreach ($issue in $json.data) {
                         $output += "Issue ID: $($issue.issueId)"
                         $output += "Message: $($issue.message)"
                         $output += "File Path: $($issue.filePath)"
-                        $output += "Severity Level: $($issue.severityLevel)"
-                        $output += "Sub Category: $($issue.subCategory)"
+                        $output += "Severity Level: $($issue.patternInfo.severityLevel)"
+                        $output += "Sub Category: $($issue.patternInfo.subCategory)"
                         $output += "--------------------------------------"
                     }
                     $output | Out-File -Encoding UTF8 codacy_issues.txt
                 }
                 catch {
                     Write-Host "ERROR: Failed to parse JSON!"
+                    Write-Host $_
                     exit 1
                 }
                 '''
