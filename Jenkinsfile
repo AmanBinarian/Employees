@@ -2,6 +2,7 @@ pipeline {
     agent any
     environment {
         CODACY_API_TOKEN = credentials('codacy-token')
+        GMAIL_APP_PASSWORD = credentials('app-password')
     }
     stages {
         stage('Build') {
@@ -69,7 +70,8 @@ pipeline {
        $smtpServer = "smtp.gmail.com"
        $smtpPort = 587
        $smtpUser = "studyproject9821@gmail.com"
-       $smtpPass = "jfob oxbo nsdd ilfz"
+       $smtpPass = $env:GMAIL_APP_PASSWORD
+
 
      $from = "studyproject9821@gmail.com"
      $to = "supradip.majumdar@binarysemantics.com"
