@@ -67,34 +67,36 @@ pipeline {
       stage('Send Email') {
     steps {
         powershell '''
-        $smtpServer = "smtp.gmail.com"
-        $smtpPort = 587
-        $smtpUser = "studyproject9821@gmail.com"
-        
-        # Retrieve password securely from Jenkins credentials
-        $smtpPass = "${env.SMTP_PASSWORD}"
+       $smtpServer = "smtp.gmail.com"
+       $smtpPort = 587
+       $smtpUser = "studyproject9821@gmail.com"
+       $smtpPass = "${env.SMTP_PASSWORD}"
 
-        $from = "studyproject9821@gmail.com"
-        $to = "supradip.majumdar@binarysemantics.com"
-        $subject = "Codacy Issues Report"
-        $body = "Attached is the Codacy issues report."
-        $attachmentPath = "codacy_issues.txt"
+     $from = "studyproject9821@gmail.com"
+     $to = "supradip.majumdar@binarysemantics.com"
+     $subject = "Codacy Issues Report"
+     $body = "Attached is the Codacy issues report."
 
-        # Create Mail Message Object
-        $message = New-Object System.Net.Mail.MailMessage
-        $message.From = $from
-        $message.To.Add($to)
-        $message.Subject = $subject
-        $message.Body = $body
-        $message.Attachments.Add((New-Object System.Net.Mail.Attachment($attachmentPath)))
+    # Ensure the file path is set correctly
+    $attachmentPath = "codacy_issues.txt"
 
-        # Configure SMTP Client
-        $smtp = New-Object Net.Mail.SmtpClient($smtpServer, $smtpPort)
-        $smtp.EnableSsl = $true
-        $smtp.Credentials = New-Object System.Net.NetworkCredential($smtpUser, $smtpPass)
+    # Create Mail Message Object
+    $message = New-Object System.Net.Mail.MailMessage
+  $message.From = $from
+  $message.To.Add($to)
+  $message.Subject = $subject
+  $message.Body = $body
 
-        # Send Email
-        $smtp.Send($message)
+     # Attach the file
+    $message.Attachments.Add((New-Object System.Net.Mail.Attachment($attachmentPath)))
+
+   # Configure SMTP Client
+   $smtp = New-Object Net.Mail.SmtpClient($smtpServer, $smtpPort)
+   $smtp.EnableSsl = $true
+   $smtp.Credentials = New-Object System.Net.NetworkCredential($smtpUser, $smtpPass)
+
+    # Send Email
+   $smtp.Send($message)
         '''
     }
 }
