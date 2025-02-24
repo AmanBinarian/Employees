@@ -114,6 +114,6 @@ public class EmployeeService {
     }
 
     public List<Employee> getEmployeeDetails() {
-        return employeeRepository.findAll();
+        return employeeRepository.();
     }
 }
