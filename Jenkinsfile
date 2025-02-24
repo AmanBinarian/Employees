@@ -67,7 +67,7 @@ pipeline {
                     "$errorCount Errors`n$warningCount Warnings" | Out-File -Encoding UTF8 error_warning_count.txt
 
                     # Generate HTML file for Pie Chart
-$htmlContent = @'
+                    $htmlContent = @"
 <!DOCTYPE html>
 <html>
 <head>
@@ -94,11 +94,14 @@ $htmlContent = @'
     </script>
 </head>
 <body>
+    <h2>Codacy Issues Report</h2>
+    <p>Errors: $errorCount</p>
+    <p>Warnings: $warningCount</p>
     <div id="piechart" style="width: 600px; height: 400px;"></div>
 </body>
 </html>
-'@
-                    
+"@
+
                     $htmlContent | Out-File -Encoding UTF8 chart.html
                 } 
                 catch {
@@ -124,12 +127,12 @@ $htmlContent = @'
                     $smtpPass = $env:GMAIL_APP_PASSWORD
 
                     $from = "studyproject9821@gmail.com"
-                    $to = "aman.kumar@binarysemantics.com"
+                    $to = "supradip.majumdar@binarysemantics.com"
                     $subject = "Codacy Issues Report"
-                    $body = "Attached is the Codacy issues report with error and warning analysis."
+                    $body = "Attached is the Codacy issues report with error and warning analysis.\n\nError Count: $errorCount\nWarning Count: $warningCount"
 
                     # Attachments
-                    $attachments = @("codacy_issues.txt", "error_warning_count.txt")
+                    $attachments = @("codacy_issues.txt", "error_warning_count.txt", "chart.html")
 
                     # Create Mail Message Object
                     $message = New-Object System.Net.Mail.MailMessage
