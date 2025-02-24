@@ -66,8 +66,8 @@ pipeline {
                     # Save error & warning count
                     "$errorCount Errors`n$warningCount Warnings" | Out-File -Encoding UTF8 error_warning_count.txt
 
-                    # Generate HTML file for Pie Chart
-                    $htmlContent = @"
+                   # Generate HTML file for Pie Chart
+$htmlContent = @"
 <!DOCTYPE html>
 <html>
 <head>
@@ -77,6 +77,8 @@ pipeline {
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
+            console.log('Google Charts Loaded...'); // Debugging
+
             var data = google.visualization.arrayToDataTable([
                 ['Category', 'Count'],
                 ['Errors', $errorCount],
@@ -85,7 +87,9 @@ pipeline {
 
             var options = {
                 title: 'Error vs Warning Distribution',
-                pieHole: 0.4
+                pieHole: 0.4,
+                colors: ['#FF0000', '#FFA500'], // Red for Errors, Orange for Warnings
+                legend: { position: 'bottom' }
             };
 
             var chart = new google.visualization.PieChart(document.getElementById('piechart'));
@@ -102,8 +106,8 @@ pipeline {
 </html>
 "@
 
-                    $htmlContent | Out-File -Encoding UTF8 chart.html
-                } 
+$htmlContent | Out-File -Encoding UTF8 chart.html
+              } 
                 catch {
                     Write-Host "ERROR: Failed to parse JSON!"
                     Write-Host $_
