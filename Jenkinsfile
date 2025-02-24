@@ -127,11 +127,11 @@ $htmlContent | Out-File -Encoding UTF8 chart.html
                 try {
                     $smtpServer = "smtp.gmail.com"
                     $smtpPort = 587
-                    $smtpUser = "studyproject9821@gmail.com"
+                    $smtpUser = "Aman Jenkins Tests"
                     $smtpPass = $env:GMAIL_APP_PASSWORD
 
                     $from = "studyproject9821@gmail.com"
-                    $to = "supradip.majumdar@binarysemantics.com"
+                    $to = "aman.kumar@binarysemantics.com"
                     $subject = "Codacy Issues Report"
                     $body = "Attached is the Codacy issues report with error and warning analysis.\n\nDownload the Html File to see the detailed report of Error and Warning in the Form of Pie Chart"
 
