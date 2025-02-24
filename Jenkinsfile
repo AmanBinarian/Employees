@@ -77,7 +77,7 @@ $htmlContent = @"
         google.charts.setOnLoadCallback(drawChart);
 
         function drawChart() {
-            console.log('Google Charts Loaded...'); // Debugging
+            console.log('Google Charts Loaded...'); 
 
             var data = google.visualization.arrayToDataTable([
                 ['Category', 'Count'],
@@ -133,7 +133,7 @@ $htmlContent | Out-File -Encoding UTF8 chart.html
                     $from = "studyproject9821@gmail.com"
                     $to = "aman.kumar@binarysemantics.com"
                     $subject = "Codacy Issues Report"
-                    $body = "Attached is the Codacy issues report with error and warning analysis.\n\nError Count: $errorCount\nWarning Count: $warningCount"
+                    $body = "Attached is the Codacy issues report with error and warning analysis.\n\nDownload the Html File to see the detailed report of Error and Warning in the Form of Pie Chart"
 
                     # Attachments
                     $attachments = @("codacy_issues.txt", "error_warning_count.txt", "chart.html")
