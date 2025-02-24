@@ -67,7 +67,7 @@ pipeline {
                     "$errorCount Errors`n$warningCount Warnings" | Out-File -Encoding UTF8 error_warning_count.txt
 
                     # Generate HTML file for Pie Chart
-                    $htmlContent = @"
+                    $htmlContent = @'
                     <!DOCTYPE html>
                     <html>
                     <head>
@@ -97,7 +97,7 @@ pipeline {
                         <div id="piechart" style="width: 600px; height: 400px;"></div>
                     </body>
                     </html>
-                    "@
+                    '@
 
                     $htmlContent | Out-File -Encoding UTF8 chart.html
                 }
@@ -123,7 +123,7 @@ pipeline {
                 $smtpPass = $env:GMAIL_APP_PASSWORD
 
                 $from = "studyproject9821@gmail.com"
-                $to = "aman.kumar@binarysemantics.com"
+                $to = "supradip.majumdar@binarysemantics.com"
                 $subject = "Codacy Issues Report"
                 $body = "Attached is the Codacy issues report with error and warning analysis."
 
