@@ -123,7 +123,7 @@ pipeline {
                 $smtpPass = $env:GMAIL_APP_PASSWORD
 
                 $from = "studyproject9821@gmail.com"
-                $to = "supradip.majumdar@binarysemantics.com"
+                $to = "aman.kumar@binarysemantics.com"
                 $subject = "Codacy Issues Report"
                 $body = "Attached is the Codacy issues report with error and warning analysis."
 
