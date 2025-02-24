@@ -127,7 +127,7 @@ $htmlContent | Out-File -Encoding UTF8 chart.html
                 try {
                     $smtpServer = "smtp.gmail.com"
                     $smtpPort = 587
-                    $smtpUser = "Aman Jenkins Tests"
+                    $smtpUser = "studyproject9821@gmail.com"
                     $smtpPass = $env:GMAIL_APP_PASSWORD
 
                     $from = "studyproject9821@gmail.com"
