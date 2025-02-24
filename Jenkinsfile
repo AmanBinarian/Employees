@@ -28,13 +28,13 @@ pipeline {
 
                 echo "Processing JSON data..."
                 powershell '''
-                $jsonContent = Get-Content issues.json -Raw
-                if (-not $jsonContent) {
-                    Write-Host "ERROR: issues.json is empty!"
-                    exit 1
-                }
-
                 try {
+                    $jsonContent = Get-Content issues.json -Raw
+                    if (-not $jsonContent) {
+                        Write-Host "ERROR: issues.json is empty!"
+                        exit 1
+                    }
+
                     $json = $jsonContent | ConvertFrom-Json
                     if (-not $json.data) {
                         Write-Host "ERROR: JSON does not contain a 'data' property!"
@@ -67,40 +67,40 @@ pipeline {
                     "$errorCount Errors`n$warningCount Warnings" | Out-File -Encoding UTF8 error_warning_count.txt
 
                     # Generate HTML file for Pie Chart
-                    $htmlContent = @'
-                    <!DOCTYPE html>
-                    <html>
-                    <head>
-                        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-                        <script type="text/javascript">
-                            google.charts.load('current', {'packages':['corechart']});
-                            google.charts.setOnLoadCallback(drawChart);
+$htmlContent = @'
+<!DOCTYPE html>
+<html>
+<head>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load('current', {'packages':['corechart']});
+        google.charts.setOnLoadCallback(drawChart);
 
-                            function drawChart() {
-                                var data = google.visualization.arrayToDataTable([
-                                    ['Category', 'Count'],
-                                    ['Errors', $errorCount],
-                                    ['Warnings', $warningCount]
-                                ]);
+        function drawChart() {
+            var data = google.visualization.arrayToDataTable([
+                ['Category', 'Count'],
+                ['Errors', $errorCount],
+                ['Warnings', $warningCount]
+            ]);
 
-                                var options = {
-                                    title: 'Error vs Warning Distribution',
-                                    pieHole: 0.4
-                                };
+            var options = {
+                title: 'Error vs Warning Distribution',
+                pieHole: 0.4
+            };
 
-                                var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-                                chart.draw(data, options);
-                            }
-                        </script>
-                    </head>
-                    <body>
-                        <div id="piechart" style="width: 600px; height: 400px;"></div>
-                    </body>
-                    </html>
-                    '@
-
+            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+            chart.draw(data, options);
+        }
+    </script>
+</head>
+<body>
+    <div id="piechart" style="width: 600px; height: 400px;"></div>
+</body>
+</html>
+'@
+                    
                     $htmlContent | Out-File -Encoding UTF8 chart.html
-                }
+                } 
                 catch {
                     Write-Host "ERROR: Failed to parse JSON!"
                     Write-Host $_
@@ -117,37 +117,46 @@ pipeline {
         stage('Send Email') {
             steps {
                 powershell '''
-                $smtpServer = "smtp.gmail.com"
-                $smtpPort = 587
-                $smtpUser = "studyproject9821@gmail.com"
-                $smtpPass = $env:GMAIL_APP_PASSWORD
+                try {
+                    $smtpServer = "smtp.gmail.com"
+                    $smtpPort = 587
+                    $smtpUser = "studyproject9821@gmail.com"
+                    $smtpPass = $env:GMAIL_APP_PASSWORD
 
-                $from = "studyproject9821@gmail.com"
-                $to = "supradip.majumdar@binarysemantics.com"
-                $subject = "Codacy Issues Report"
-                $body = "Attached is the Codacy issues report with error and warning analysis."
+                    $from = "studyproject9821@gmail.com"
+                    $to = "supradip.majumdar@binarysemantics.com"
+                    $subject = "Codacy Issues Report"
+                    $body = "Attached is the Codacy issues report with error and warning analysis."
 
-                # Attachments
-                $attachments = @("codacy_issues.txt", "error_warning_count.txt")
+                    # Attachments
+                    $attachments = @("codacy_issues.txt", "error_warning_count.txt")
 
-                # Create Mail Message Object
-                $message = New-Object System.Net.Mail.MailMessage
-                $message.From = $from
-                $message.To.Add($to)
-                $message.Subject = $subject
-                $message.Body = $body
+                    # Create Mail Message Object
+                    $message = New-Object System.Net.Mail.MailMessage
+                    $message.From = $from
+                    $message.To.Add($to)
+                    $message.Subject = $subject
+                    $message.Body = $body
 
-                foreach ($file in $attachments) {
-                    $message.Attachments.Add((New-Object System.Net.Mail.Attachment($file)))
+                    foreach ($file in $attachments) {
+                        $message.Attachments.Add((New-Object System.Net.Mail.Attachment($file)))
+                    }
+
+                    # Configure SMTP Client
+                    $smtp = New-Object Net.Mail.SmtpClient($smtpServer, $smtpPort)
+                    $smtp.EnableSsl = $true
+                    $smtp.Credentials = New-Object System.Net.NetworkCredential($smtpUser, $smtpPass)
+
+                    # Send Email
+                    $smtp.Send($message)
+
+                    Write-Host "Email sent successfully."
                 }
-
-                # Configure SMTP Client
-                $smtp = New-Object Net.Mail.SmtpClient($smtpServer, $smtpPort)
-                $smtp.EnableSsl = $true
-                $smtp.Credentials = New-Object System.Net.NetworkCredential($smtpUser, $smtpPass)
-
-                # Send Email
-                $smtp.Send($message)
+                catch {
+                    Write-Host "ERROR: Failed to send email."
+                    Write-Host $_
+                    exit 1
+                }
                 '''
             }
         }
