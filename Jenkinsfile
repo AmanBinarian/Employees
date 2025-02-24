@@ -11,7 +11,7 @@ pipeline {
                 bat 'mvn clean install -DskipTests' 
             }
         }
-       
+
         stage('Fetch Codacy Issues & Save Report') {
             steps {
                 echo "Fetching Codacy issues..."
@@ -42,6 +42,9 @@ pipeline {
                     }
 
                     $output = @()
+                    $errorCount = 0
+                    $warningCount = 0
+
                     foreach ($issue in $json.data) {
                         $output += "Issue ID: $($issue.issueId)"
                         $output += "Message: $($issue.message)"
@@ -49,8 +52,54 @@ pipeline {
                         $output += "Severity Level: $($issue.patternInfo.severityLevel)"
                         $output += "Sub Category: $($issue.patternInfo.subCategory)"
                         $output += "--------------------------------------"
+
+                        if ($issue.patternInfo.severityLevel -eq "Error") {
+                            $errorCount++
+                        } elseif ($issue.patternInfo.severityLevel -eq "Warning") {
+                            $warningCount++
+                        }
                     }
+
+                    # Save issue details
                     $output | Out-File -Encoding UTF8 codacy_issues.txt
+
+                    # Save error & warning count
+                    "$errorCount Errors`n$warningCount Warnings" | Out-File -Encoding UTF8 error_warning_count.txt
+
+                    # Generate HTML file for Pie Chart
+                    $htmlContent = @"
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+                        <script type="text/javascript">
+                            google.charts.load('current', {'packages':['corechart']});
+                            google.charts.setOnLoadCallback(drawChart);
+
+                            function drawChart() {
+                                var data = google.visualization.arrayToDataTable([
+                                    ['Category', 'Count'],
+                                    ['Errors', $errorCount],
+                                    ['Warnings', $warningCount]
+                                ]);
+
+                                var options = {
+                                    title: 'Error vs Warning Distribution',
+                                    pieHole: 0.4
+                                };
+
+                                var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+                                chart.draw(data, options);
+                            }
+                        </script>
+                    </head>
+                    <body>
+                        <div id="piechart" style="width: 600px; height: 400px;"></div>
+                    </body>
+                    </html>
+                    "@
+
+                    $htmlContent | Out-File -Encoding UTF8 chart.html
                 }
                 catch {
                     Write-Host "ERROR: Failed to parse JSON!"
@@ -59,53 +108,53 @@ pipeline {
                 }
                 '''
 
-                echo "Verifying Text File..."
+                echo "Verifying Text Files..."
                 bat "type codacy_issues.txt"
+                bat "type error_warning_count.txt"
             }
         }
 
-      stage('Send Email') {
-    steps {
-        powershell '''
-       $smtpServer = "smtp.gmail.com"
-       $smtpPort = 587
-       $smtpUser = "studyproject9821@gmail.com"
-       $smtpPass = $env:GMAIL_APP_PASSWORD
+        stage('Send Email') {
+            steps {
+                powershell '''
+                $smtpServer = "smtp.gmail.com"
+                $smtpPort = 587
+                $smtpUser = "studyproject9821@gmail.com"
+                $smtpPass = $env:GMAIL_APP_PASSWORD
 
+                $from = "studyproject9821@gmail.com"
+                $to = "supradip.majumdar@binarysemantics.com"
+                $subject = "Codacy Issues Report"
+                $body = "Attached is the Codacy issues report with error and warning analysis."
 
-     $from = "studyproject9821@gmail.com"
-     $to = "supradip.majumdar@binarysemantics.com"
-     $subject = "Codacy Issues Report"
-     $body = "Attached is the Codacy issues report."
+                # Attachments
+                $attachments = @("codacy_issues.txt", "error_warning_count.txt")
 
-    # Ensure the file path is set correctly
-    $attachmentPath = "codacy_issues.txt"
+                # Create Mail Message Object
+                $message = New-Object System.Net.Mail.MailMessage
+                $message.From = $from
+                $message.To.Add($to)
+                $message.Subject = $subject
+                $message.Body = $body
 
-    # Create Mail Message Object
-    $message = New-Object System.Net.Mail.MailMessage
-  $message.From = $from
-  $message.To.Add($to)
-  $message.Subject = $subject
-  $message.Body = $body
+                foreach ($file in $attachments) {
+                    $message.Attachments.Add((New-Object System.Net.Mail.Attachment($file)))
+                }
 
-     # Attach the file
-    $message.Attachments.Add((New-Object System.Net.Mail.Attachment($attachmentPath)))
+                # Configure SMTP Client
+                $smtp = New-Object Net.Mail.SmtpClient($smtpServer, $smtpPort)
+                $smtp.EnableSsl = $true
+                $smtp.Credentials = New-Object System.Net.NetworkCredential($smtpUser, $smtpPass)
 
-   # Configure SMTP Client
-   $smtp = New-Object Net.Mail.SmtpClient($smtpServer, $smtpPort)
-   $smtp.EnableSsl = $true
-   $smtp.Credentials = New-Object System.Net.NetworkCredential($smtpUser, $smtpPass)
+                # Send Email
+                $smtp.Send($message)
+                '''
+            }
+        }
 
-    # Send Email
-   $smtp.Send($message)
-        '''
-    }
-}
-
-        
         stage('Archive Reports') {
             steps {
-                archiveArtifacts artifacts: 'codacy_issues.txt, issues.json, codacy_issues.pdf', fingerprint: true
+                archiveArtifacts artifacts: 'codacy_issues.txt, issues.json, error_warning_count.txt, chart.html', fingerprint: true
             }
         }
     }
