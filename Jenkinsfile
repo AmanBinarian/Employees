@@ -55,6 +55,8 @@ curl -X POST ^
                         $output += "Sub Category: $($issue.patternInfo.subCategory)"
                         $output += "--------------------------------------"
 
+                       # Bar Graph Part
+                        
                         if ($issue.patternInfo.severityLevel -eq "Error") {
                             $errorCount++
                         } elseif ($issue.patternInfo.severityLevel -eq "Warning") {
