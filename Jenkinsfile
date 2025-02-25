@@ -16,10 +16,10 @@ pipeline {
             steps {
                 echo "Fetching Codacy issues..."
                 bat """
-                curl -X POST "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^
-                     --header "api-token: %CODACY_API_TOKEN%" ^
-                     --header "Content-Type: application/json" ^
-                     --silent --show-error --fail ^
+                curl -X POST "https://app.codacy.com/api/v3/analysis/organizations/gh/AmanBinarian/repositories/Employees/issues/search" ^ 
+                     --header "api-token: %CODACY_API_TOKEN%" ^ 
+                     --header "Content-Type: application/json" ^ 
+                     --silent --show-error --fail ^ 
                      --output issues.json
                 """
 
@@ -66,50 +66,23 @@ pipeline {
                     # Save error & warning count
                     "$errorCount Errors`n$warningCount Warnings" | Out-File -Encoding UTF8 error_warning_count.txt
 
-                   # Generate HTML file for Pie Chart
-$htmlContent = @"
-<!DOCTYPE html>
-<html>
-<head>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(drawChart);
+                    # Read HTML template file
+                    $templatePath = "template.html"
+                    if (!(Test-Path $templatePath)) {
+                        Write-Host "ERROR: HTML template file not found!"
+                        exit 1
+                    }
 
-        function drawChart() {
-            console.log('Google Charts Loaded...'); 
+                    $htmlTemplate = Get-Content $templatePath -Raw
 
-            var data = google.visualization.arrayToDataTable([
-                ['Category', 'Count'],
-                ['Errors', $errorCount],
-                ['Warnings', $warningCount]
-            ]);
+                    # Replace placeholders in template
+                    $htmlContent = $htmlTemplate -replace "{{ERROR_COUNT}}", $errorCount -replace "{{WARNING_COUNT}}", $warningCount
 
-            var options = {
-                title: 'Error vs Warning Distribution',
-                pieHole: 0.4,
-                colors: ['#FF0000', '#FFA500'], // Red for Errors, Orange for Warnings
-                legend: { position: 'bottom' }
-            };
+                    # Save the final report
+                    $htmlContent | Out-File -Encoding UTF8 chart.html
 
-            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
-            chart.draw(data, options);
-        }
-    </script>
-</head>
-<body>
-    <h2>Codacy Issues Report</h2>
-    <p>Errors: $errorCount</p>
-    <p>Warnings: $warningCount</p>
-    <div id="piechart" style="width: 600px; height: 400px;"></div>
-</body>
-</html>
-"@
-
-$htmlContent | Out-File -Encoding UTF8 chart.html
-              } 
-                catch {
-                    Write-Host "ERROR: Failed to parse JSON!"
+                } catch {
+                    Write-Host "ERROR: Failed to process JSON!"
                     Write-Host $_
                     exit 1
                 }
@@ -131,9 +104,9 @@ $htmlContent | Out-File -Encoding UTF8 chart.html
                     $smtpPass = $env:GMAIL_APP_PASSWORD
 
                     $from = "studyproject9821@gmail.com"
-                    $to = "supradip.majumdar@binarysemantics.com"
+                    $to = "aman.kumar@binarysemantics.com"
                     $subject = "Codacy Issues Report"
-                    $body = "Attached is the Codacy issues report with error and warning analysis.\n\nDownload the Html File to see the detailed report of Error and Warning in the Form of Pie Chart"
+                    $body = "Attached is the Codacy issues report with error and warning analysis.\n\nDownload the HTML file to see the detailed report of errors and warnings in the form of a pie chart."
 
                     # Attachments
                     $attachments = @("codacy_issues.txt", "error_warning_count.txt", "chart.html")
