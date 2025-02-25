@@ -106,7 +106,7 @@ curl -X POST ^
                     $smtpPass = $env:GMAIL_APP_PASSWORD
 
                     $from = "studyproject9821@gmail.com"
-                    $to = "aman.kumar@binarysemantics.com"
+                    $to = "supradip.majumdar@binarysemantics.com"
                     $subject = "Codacy Issues Report"
                     $body = "Attached is the Codacy issues report with error and warning analysis.\n\nDownload the HTML file to see the detailed report of errors and warnings in the form of a pie chart."
 
